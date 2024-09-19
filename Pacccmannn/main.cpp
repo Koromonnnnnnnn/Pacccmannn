@@ -1,39 +1,45 @@
-#include<SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include "Player.h"
+#include "Level.h"
+
 using namespace sf;
 using namespace std;
 
-void handleInput(Player& player) {
-	if (Keyboard::isKeyPressed(Keyboard::Left)) player.move(-1, 0);
-	if (Keyboard::isKeyPressed(Keyboard::Right)) player.move(1, 0);
-	if (Keyboard::isKeyPressed(Keyboard::Up)) player.move(0, -1);
-	if (Keyboard::isKeyPressed(Keyboard::Down)) player.move(0, 1);
+void handleInput(Player& player, float deltaTime) {
+    const float speed = 200.0f;
+    if (Keyboard::isKeyPressed(Keyboard::Left)) player.move(-speed * deltaTime, 0);
+    if (Keyboard::isKeyPressed(Keyboard::Right)) player.move(speed * deltaTime, 0);
+    if (Keyboard::isKeyPressed(Keyboard::Up)) player.move(0, -speed * deltaTime);
+    if (Keyboard::isKeyPressed(Keyboard::Down)) player.move(0, speed * deltaTime);
 }
 
-Player player;
-
 int main() {
+    RenderWindow window(VideoMode(800, 600), "Pacman Game", Style::Close);
+    window.setFramerateLimit(60);
 
-	RenderWindow window(VideoMode(800, 600), "Pacman Game", Style::Close); window.setFramerateLimit(60);
+    Player player;
+    Level level;
 
-	Event event;
+    Event event;
+    Clock clock; 
 
-	while (window.isOpen()) {
+    while (window.isOpen()) {
+        float deltaTime = clock.restart().asSeconds(); 
 
-		while (window.pollEvent(event)) {
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) {
+                window.close();
+            }
+        }
 
-			if (event.type == Event::Closed) { window.close(); }
+        handleInput(player, deltaTime); 
 
-		}
+        window.clear(Color::Black);
 
-		handleInput(player);
+        level.draw(window);
 
+        window.display();
+    }
 
-		window.clear((Color::Black));
-
-
-		window.display();
-	}
-
-	return 0;
+    return 0;
 }
